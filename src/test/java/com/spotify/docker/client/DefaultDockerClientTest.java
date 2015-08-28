@@ -19,10 +19,10 @@ package com.spotify.docker.client;
 
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.common.io.Resources;
 import com.google.common.util.concurrent.SettableFuture;
-
 import com.fasterxml.jackson.databind.util.StdDateFormat;
 import com.spotify.docker.client.DockerClient.AttachParameter;
 import com.spotify.docker.client.messages.AuthConfig;
@@ -599,7 +599,7 @@ public class DefaultDockerClientTest {
       assertThat(out.toString(),allOf(containsString("Pulling repository busybox"),
                                       containsString("Image is up to date")));
     } else {
-      assertThat(out.toString(),allOf(containsString("Pulling from busybox"),
+      assertThat(out.toString(),allOf(containsString("Pulling from library/busybox"),
                                        containsString("Image is up to date")));
     }
   }
@@ -1023,10 +1023,12 @@ public class DefaultDockerClientTest {
     final boolean privileged = true;
     final boolean publishAllPorts = true;
     final String dns = "1.2.3.4";
+    final List<String> extraHosts = Lists.newArrayList("192.168.0.1:80");
     final HostConfig expected = HostConfig.builder()
             .privileged(privileged)
             .publishAllPorts(publishAllPorts)
             .dns(dns)
+            .extraHosts(extraHosts)
             .cpuShares((long) 4096)
             .build();
 
@@ -1046,6 +1048,7 @@ public class DefaultDockerClientTest {
     assertThat(actual.privileged(), equalTo(expected.privileged()));
     assertThat(actual.publishAllPorts(), equalTo(expected.publishAllPorts()));
     assertThat(actual.dns(), equalTo(expected.dns()));
+    assertThat(actual.extraHosts(), equalTo(expected.extraHosts()));
   }
 
   @Test
